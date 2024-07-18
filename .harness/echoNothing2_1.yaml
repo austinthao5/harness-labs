@@ -1,0 +1,21 @@
+template:
+  name: echoNothing2
+  identifier: echoNothing2
+  versionLabel: "1"
+  type: Step
+  projectIdentifier: CSE_Lab_Project
+  orgIdentifier: CSE_Labs
+  tags: {}
+  spec:
+    timeout: 10m
+    type: ShellScript
+    spec:
+      shell: Bash
+      executionTarget: {}
+      delegateSelectors: []
+      source:
+        type: Inline
+        spec:
+          script: echo "nothing2"
+      environmentVariables: []
+      outputVariables: []
