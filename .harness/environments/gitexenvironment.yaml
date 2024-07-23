@@ -1,0 +1,8 @@
+environment:
+  name: gitex-environment
+  identifier: gitexenvironment
+  description: ""
+  tags: {}
+  type: PreProduction
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
