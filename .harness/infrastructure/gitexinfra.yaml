@@ -1,0 +1,13 @@
+infrastructureDefinition:
+  name: gitex-infra
+  identifier: gitexinfra
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  environmentRef: gitexenvironment
+  deploymentType: Kubernetes
+  type: KubernetesDirect
+  spec:
+    connectorRef: account.testeksconnector
+    namespace: austin-test-ns
+    releaseName: release-<+INFRA_KEY_SHORT_ID>
+  allowSimultaneousDeployments: false
