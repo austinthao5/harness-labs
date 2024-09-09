@@ -6,6 +6,21 @@ pipeline:
   tags: {}
   stages:
     - stage:
+        name: template
+        identifier: template
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  name: test
+                  identifier: test
+                  template:
+                    templateRef: echoMeTemplate3
+                    versionLabel: "1"
+        tags: {}
+    - stage:
         name: abc
         identifier: abc
         description: ""
