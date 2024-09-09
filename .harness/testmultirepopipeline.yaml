@@ -19,6 +19,12 @@ pipeline:
                   template:
                     templateRef: echoMeTemplate3
                     versionLabel: "1"
+              - step:
+                  name: test2
+                  identifier: test2
+                  template:
+                    templateRef: echoMeTemplate2
+                    versionLabel: "1"
         tags: {}
     - stage:
         name: abc
