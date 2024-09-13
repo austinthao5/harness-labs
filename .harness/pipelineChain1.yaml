@@ -37,3 +37,5 @@ pipeline:
           org: CSE_Labs
           pipeline: pipelineChain2
           project: CSE_Lab_Project
+          inputSetReferences:
+            - pipelineChain2InputSet
