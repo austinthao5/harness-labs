@@ -28,3 +28,12 @@ pipeline:
                     outputVariables: []
                   timeout: 10m
         tags: {}
+    - stage:
+        name: test
+        identifier: test
+        description: ""
+        type: Pipeline
+        spec:
+          org: CSE_Labs
+          pipeline: pipelineChain2
+          project: CSE_Lab_Project
