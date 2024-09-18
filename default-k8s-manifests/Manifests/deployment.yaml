@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:{{.Values.image}}
+        image: nginx:latest
         ports:
         - containerPort: 80
 ---
@@ -29,4 +29,5 @@ data:
   c360.case-management.case-request-topic-name: "private.adc.self_service.case_request.qa"
   c360.case-management.config.profile-activity-max-attempts: "4"
   c360.case-management.config.sendgrid-confirmation-max-attempts: '2'
+  test-value: {{.Values.testValue}}
     

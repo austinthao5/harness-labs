@@ -7,6 +7,7 @@ jobName: austin-test
 createNamespace: true
 staticNamespace: static-namespace
 namespace: ${serviceVariable.namespace}
+testValue: "<+pipeline.variables.number>"
 
 # Service Type allow you to specify what kind of service you want.
 # Possible values for ServiceType are:
