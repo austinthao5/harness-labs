@@ -21,16 +21,4 @@ pipeline:
                 serviceOverrideInputs: <+input>
                 infrastructureDefinitions: <+input>
               service:
-                serviceRef: testnondefaultservice
-                serviceInputs:
-                  serviceDefinition:
-                    type: Kubernetes
-                    spec:
-                      artifacts:
-                        primary:
-                          primaryArtifactRef: artifact
-                          sources:
-                            - identifier: artifact
-                              type: DockerRegistry
-                              spec:
-                                tag: <+input>
+                serviceRef: testanothernondefaultservice
