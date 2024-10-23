@@ -21,12 +21,16 @@ pipeline:
                 serviceOverrideInputs: <+input>
                 infrastructureDefinitions: <+input>
               service:
-                serviceRef: testgitmoveservice
+                serviceRef: testnondefaultservice
                 serviceInputs:
                   serviceDefinition:
                     type: Kubernetes
                     spec:
                       artifacts:
                         primary:
-                          primaryArtifactRef: <+input>
-                          sources: <+input>
+                          primaryArtifactRef: artifact
+                          sources:
+                            - identifier: artifact
+                              type: DockerRegistry
+                              spec:
+                                tag: <+input>
