@@ -1,0 +1,19 @@
+service:
+  name: test-non-default-service
+  identifier: testnondefaultservice
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  serviceDefinition:
+    spec:
+      artifacts:
+        primary:
+          primaryArtifactRef: <+input>
+          sources:
+            - spec:
+                connectorRef: account.AT_Docker
+                imagePath: library/nginx
+                tag: <+input>
+                digest: ""
+              identifier: artifact
+              type: DockerRegistry
+    type: Kubernetes
