@@ -33,5 +33,6 @@ pipeline:
         variables:
           - name: test
             type: String
+            description: ""
             required: false
             value: <+input>
