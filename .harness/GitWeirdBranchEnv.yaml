@@ -1,0 +1,6 @@
+environment:
+  name: GitWeirdBranchEnv
+  identifier: GitWeirdBranchEnv
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  type: PreProduction
