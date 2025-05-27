@@ -24,9 +24,3 @@ spec:
             - |
               echo "Creating ConfigMap..."
               kubectl create configmap generated-at-runtime --from-literal=key=value -n austin-prod1-agent
-              echo "Annotating ConfigMap for Argo CD to ignore..."
-              kubectl annotate configmap generated-at-runtime -n austin-prod1-agent \
-                argocd.argoproj.io/compare-options=IgnoreExtraneous \
-                argocd.argoproj.io/sync-options=Skip --overwrite
-              echo "Annotations applied. Sleeping..."
-              sleep 3600
