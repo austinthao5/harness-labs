@@ -1,0 +1,25 @@
+pipeline:
+  name: GenesisTester
+  identifier: GenesisTester
+  projectIdentifier: CSE_Lab_Project
+  orgIdentifier: CSE_Labs
+  tags: {}
+  stages:
+    - stage:
+        name: test
+        identifier: test
+        tags: {}
+        template:
+          templateRef: GenesisDeploy
+          versionLabel: "1"
+          templateInputs:
+            type: Deployment
+            spec:
+              environment:
+                environmentRef: <+input>
+                environmentInputs: <+input>
+                serviceOverrideInputs: <+input>
+                infrastructureDefinitions: <+input>
+              service:
+                serviceRef: <+input>
+                serviceInputs: <+input>
