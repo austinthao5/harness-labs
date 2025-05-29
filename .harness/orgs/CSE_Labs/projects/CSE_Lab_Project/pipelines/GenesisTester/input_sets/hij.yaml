@@ -1,0 +1,28 @@
+inputSet:
+  name: hij
+  identifier: hij
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  pipeline:
+    identifier: GenesisTester
+    stages:
+      - stage:
+          identifier: test
+          template:
+            templateInputs:
+              type: Deployment
+              spec:
+                service:
+                  serviceRef: <+pipeline.stages.test.description>
+                environment:
+                  environmentRef: DeluxeCorpMulesoftDemoEnv
+                  infrastructureDefinitions: []
+              variables:
+                - name: version_fallback
+                  type: String
+                  value: ""
+                - name: jira_id
+                  type: String
+                  value: ""
+              when:
+                condition: ""
