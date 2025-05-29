@@ -20,9 +20,8 @@ pipeline:
                 serviceInputs: <+input>
               environment:
                 environmentRef: <+input>
-                environmentInputs: <+input>
-                serviceOverrideInputs: <+input>
                 infrastructureDefinitions: <+input>
+                environmentInputs: <+input>
             variables:
               - name: version_fallback
                 type: String
