@@ -1,5 +1,6 @@
 inputSet:
   name: hij
+  tags: {}
   identifier: hij
   orgIdentifier: CSE_Labs
   projectIdentifier: CSE_Lab_Project
@@ -14,9 +15,11 @@ inputSet:
               spec:
                 service:
                   serviceRef: <+pipeline.stages.test.description>
+                  serviceInputs: <+input>
                 environment:
                   environmentRef: DeluxeCorpMulesoftDemoEnv
-                  infrastructureDefinitions: []
+                  infrastructureDefinitions:
+                    - identifier: MulesoftDev
               variables:
                 - name: version_fallback
                   type: String
