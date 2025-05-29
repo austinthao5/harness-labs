@@ -1,0 +1,39 @@
+template:
+  name: GenesisDeploy
+  identifier: GenesisDeploy
+  versionLabel: "1"
+  type: Stage
+  projectIdentifier: CSE_Lab_Project
+  orgIdentifier: CSE_Labs
+  tags: {}
+  spec:
+    type: Deployment
+    spec:
+      deploymentType: CustomDeployment
+      customDeploymentRef:
+        templateRef: account.CustomDeploymentUSE_THIS
+        versionLabel: "1.0"
+      execution:
+        steps:
+          - step:
+              name: Fetch Instances
+              identifier: fetchInstances
+              type: FetchInstanceScript
+              timeout: 10m
+              spec: {}
+        rollbackSteps: []
+      environment:
+        environmentRef: <+input>
+        deployToAll: false
+        environmentInputs: <+input>
+        serviceOverrideInputs: <+input>
+        infrastructureDefinitions: <+input>
+      service:
+        serviceRef: <+input>
+        serviceInputs: <+input>
+    failureStrategies:
+      - onFailure:
+          errors:
+            - AllErrors
+          action:
+            type: StageRollback
