@@ -12,7 +12,10 @@ template:
       deploymentType: CustomDeployment
       customDeploymentRef:
         templateRef: account.CustomDeploymentUSE_THIS
-        versionLabel: "1.0"
+        versionLabel: v1
+      service:
+        serviceRef: <+input>
+        serviceInputs: <+input>
       execution:
         steps:
           - step:
@@ -21,19 +24,588 @@ template:
               type: FetchInstanceScript
               timeout: 10m
               spec: {}
-        rollbackSteps: []
+          - step:
+              type: ShellScript
+              name: validate-inputs
+              identifier: validateinputs
+              spec:
+                shell: Bash
+                executionTarget: {}
+                source:
+                  type: Inline
+                  spec:
+                    script: |
+                      # Validate input variables
+
+                      if [ -z "$MANIFEST_ID" ]; then
+                        echo "Error: MANIFEST_ID variable is not set."
+                        exit 1
+                      fi
+                environmentVariables:
+                  - name: MANIFEST_ID
+                    type: String
+                    value: <+artifact.tag>
+                outputVariables: []
+              timeout: 10m
+              failureStrategies:
+                - onFailure:
+                    errors:
+                      - AllErrors
+                    action:
+                      type: Abort
+          - stepGroup:
+              name: deploy-job
+              identifier: deployjob
+              steps:
+                - step:
+                    type: Run
+                    name: check-pool-lock
+                    identifier: checkpoollock
+                    spec:
+                      connectorRef: account.pypldockerhub
+                      image: alpine
+                      shell: Sh
+                      command: |-
+                        #!/bin/sh
+
+                        set -euo pipefail
+
+                        # Install dependencies
+                        apk add --no-cache jq curl
+
+                        # Validate input variables
+                        ENVIRONMENT="${ENVIRONMENT?Error: ENVIRONMENT(Namespace) variable is not set.}"
+                        SERVICE_NAME="${SERVICE_NAME?Error: SERVICE_NAME variable is not set.}"
+                        TIMEOUT="${TIMEOUT:-3600}" # Timeout threshold in seconds (default: 1 hour)
+                        POLL_INTERVAL="${POLL_INTERVAL:-300}" # Poll interval in seconds (default: 5 minutes)
+
+                        echo "Checking if pool ($SERVICE_NAME) is locked. Polling every $POLL_INTERVAL seconds for up to $TIMEOUT seconds."
+
+                        # Initialize variables
+                        start_time=$(date +%s)
+
+                        while true; do
+                          # Make the API call
+                          curl_output=$(curl -s -o /dev/null -w "%{http_code}" "https://engineering.paypalcorp.com/genesis/api/genesis/api/v2/tenant/paypal/namespace/$ENVIRONMENT/pool/$SERVICE_NAME/lock" \
+                            -H 'Content-Type: application/json')
+
+                          if [ "$curl_output" -eq 404 ]; then
+                            echo "Pool $SERVICE_NAME is not locked."
+                            break
+                          elif [ "$curl_output" -eq 200 ]; then
+                            echo "Pool $SERVICE_NAME is still locked. Retrying in $POLL_INTERVAL seconds..."
+                          else
+                            echo "Unexpected response: $curl_output. Assuming pool is locked."
+                            exit 1
+                          fi
+
+                          # Check if timeout threshold is reached
+                          current_time=$(date +%s)
+                          elapsed_time=$((current_time - start_time))
+                          if [ "$elapsed_time" -ge "$TIMEOUT" ]; then
+                            echo "Timeout reached after $TIMEOUT seconds. Pool $SERVICE_NAME is still locked."
+                            exit 1
+                          fi
+
+                          # Wait for the poll interval
+                          sleep "$POLL_INTERVAL"
+                        done
+                      envVariables:
+                        ENVIRONMENT: <+infra.variables.environment>
+                        SERVICE_NAME: <+service.name>
+                - step:
+                    type: Run
+                    spec:
+                      connectorRef: account.pypldockerhub
+                      image: alpine
+                      shell: Sh
+                      command: |-
+                        #!/bin/bash
+
+                        set -euo pipefail
+
+                        apk add --no-cache curl jq
+
+                        # Validate input variables
+                        SSO_HRZ_USERNAME="${SSO_HRZ_USERNAME?Error: SSO_HRZ_USERNAME variable is not set.}"
+                        SSO_HRZ_PASSWORD="${SSO_HRZ_PASSWORD?Error: SSO_HRZ_PASSWORD variable is not set.}"
+                        SSO_HRZ_CLIENT_SECRET="${SSO_HRZ_CLIENT_SECRET?Error: SSO_HRZ_CLIENT_SECRET variable is not set.}"
+                        SSO_HRZ_CLIENT_ID="${SSO_HRZ_CLIENT_ID?Error: SSO_HRZ_CLIENT_ID variable is not set.}"
+
+                        curl_output=$(curl -s https://ssohrz.paypalinc.com/as/token.oauth2 \
+                            --header 'Content-Type: application/x-www-form-urlencoded' \
+                            --data-urlencode "grant_type=password" \
+                            --data-urlencode "scope=openid profile pp2faad genesis" \
+                            --data-urlencode "username=$SSO_HRZ_USERNAME" \
+                            --data-urlencode "password=$SSO_HRZ_PASSWORD" \
+                            --data-urlencode "client_id=$SSO_HRZ_CLIENT_ID" \
+                            --data-urlencode "client_secret=$SSO_HRZ_CLIENT_SECRET")
+
+                        # Validate curl output
+                        if [ -z "$curl_output" ]; then
+                          echo "Error: curl returned empty JSON output"
+                          exit 1
+                        fi
+
+                        # Validate JSON
+                        if ! echo "$curl_output" | jq -e . > /dev/null 2>&1; then
+                          echo "Error: Invalid JSON response from curl. API response was: $curl_output"
+                          exit 1
+                        fi
+
+                        # Extract access token
+                        SSO_HRZ_TOKEN=$(echo "$curl_output" | jq -r '.access_token')
+                      envVariables:
+                        SSO_HRZ_USERNAME: <+secrets.getValue("account.ldap_username")>
+                        SSO_HRZ_PASSWORD: <+secrets.getValue("account.ldap_password")>
+                        SSO_HRZ_CLIENT_ID: <+secrets.getValue("account.sso_client_id")>
+                        SSO_HRZ_CLIENT_SECRET: <+secrets.getValue("account.sso_client_secret")>
+                      outputVariables:
+                        - name: SSO_HRZ_TOKEN
+                          type: String
+                          value: SSO_HRZ_TOKEN
+                      imagePullPolicy: IfNotPresent
+                    timeout: 1m
+                    name: get-sso-hrz-token
+                    identifier: getssohrztoken
+                  contextType: StageTemplate
+                - step:
+                    type: Run
+                    name: get-deploy-strategy
+                    identifier: getdeploystrategy
+                    spec:
+                      connectorRef: account.pypldockerhub
+                      image: alpine
+                      shell: Sh
+                      command: |-
+                        #!/bin/sh
+
+                        set -euo pipefail
+
+                        apk add --no-cache curl jq
+
+                        # Validate input variables
+                        ENVIRONMENT="${ENVIRONMENT?Error: ENVIRONMENT(Namespace) variable is not set.}"
+                        SERVICE_NAME="${SERVICE_NAME?Error: SERVICE_NAME variable is not set.}"
+                        HRZ_TOKEN="${HRZ_TOKEN?Error: HRZ_TOKEN variable is not set.}"
+
+                        echo "Fetching the default deploy strategy of the pool"
+
+                        curl_output=$(curl -s "https://engineering.paypalcorp.com/genesis/api/genesis/api/v2/tenant/paypal/namespace/$ENVIRONMENT/pool/$SERVICE_NAME" \
+                          -H 'Content-Type: application/json' \
+                          -H "Token: $HRZ_TOKEN" \
+                          -H 'Provider: pingid')
+
+                        # Validate curl output
+                        if [ -z "$curl_output" ]; then
+                          echo "Error: curl returned empty JSON output"
+                          exit 1
+                        fi
+
+                        # Validate JSON
+                        if ! echo "$curl_output" | jq -e . > /dev/null 2>&1; then
+                          echo "Error: Invalid JSON response from curl. API response was: $curl_output"
+                          exit 1
+                        fi
+
+                        # Check for API error code
+                        if echo "$curl_output" | jq -e 'has("code")' > /dev/null 2>&1; then
+                          curl_code=$(echo "$curl_output" | jq -r '.code')
+                          if [ -n "$curl_code" ] && [ "$curl_code" -lt 200 -o "$curl_code" -ge 300 ]; then
+                            curl_message=$(echo "$curl_output" | jq -r '.message')
+                            echo "Error: HTTP $curl_code: $curl_message. API response was: $curl_output"
+                            exit 1
+                          fi
+                        fi
+
+                        # Extract deploy strategy
+                        DEPLOY_STRATEGY=$(echo "$curl_output" | jq -r '.deployStrategyType')
+
+                        # Validate deploy strategy
+                        if [ "$DEPLOY_STRATEGY" = "null" ]; then
+                          echo "Error: 'deployStrategyType' field not found in JSON response. API Response was: $curl_output"
+                          exit 1
+                        fi
+
+                        if [ -z "$DEPLOY_STRATEGY" ]; then
+                          echo "Error: DEPLOY_STRATEGY is empty after jq processing. API response was: $curl_output"
+                          exit 1
+                        fi
+
+                        echo "Default deploy strategy of the pool: $DEPLOY_STRATEGY"
+                        export DEPLOY_STRATEGY
+                      envVariables:
+                        HRZ_TOKEN: <+stage.spec.execution.steps.deployjob.steps.getssohrztoken.output.outputVariables.SSO_HRZ_TOKEN>
+                        ENVIRONMENT: <+infra.variables.environment>
+                        SERVICE_NAME: <+service.name>
+                      outputVariables:
+                        - name: DEPLOY_STRATEGY
+                          type: String
+                          value: DEPLOY_STRATEGY
+                - step:
+                    type: Run
+                    name: schedule-job
+                    identifier: schedulejob
+                    spec:
+                      connectorRef: account.pypldockerhub
+                      image: alpine
+                      shell: Sh
+                      command: |-
+                        #!/bin/sh
+
+                        set -euo pipefail
+
+                        # Install dependencies
+                        apk add --no-cache jq curl
+
+                        # Define variables
+                        ENVIRONMENT="${ENVIRONMENT?Error: ENVIRONMENT(Namespace) variable is not set.}"
+                        HRZ_TOKEN="${HRZ_TOKEN?Error: HRZ_TOKEN variable is not set.}"
+                        MANIFEST="${MANIFEST?Error: MANIFEST variable is not set.}"
+                        DEPLOY_STRATEGY="${DEPLOY_STRATEGY?Error: DEPLOY_STRATEGY variable is not set.}"
+                        SERVICE_NAME="${SERVICE_NAME?Error: SERVICE_NAME variable is not set.}"
+
+                        if [ -z "$JIRA_ID" ]; then
+                          echo "JIRA_ID was returned as: $JIRA_ID, hence using default value"
+                          JIRA_ID="NO_JIRA_ID"
+                        fi
+
+                        echo "Deploying manifest: $MANIFEST (JIRA_ID: $JIRA_ID), using $DEPLOY_STRATEGY strategy on pool: $SERVICE_NAME"
+
+                        curl_output=$(curl -s "https://engineering.paypalcorp.com/genesis/api/genesis/api/v2/tenant/paypal/namespace/$ENVIRONMENT/pool/$SERVICE_NAME/task" \
+                          -H 'X-Genesis-Enhance-Payload: 1' \
+                          -H 'Content-Type: application/json' \
+                          -H "Token: $HRZ_TOKEN" \
+                          -H 'Provider: pingid' \
+                          --data-raw '{"deployspec":{"version":"'$MANIFEST'","deployStrategy":{"type":"'$DEPLOY_STRATEGY'"}},"requestConfig":{"ByPassTicket":"false","DeploySandbox":"true","JiraId":"'$JIRA_ID'"}}')
+
+                        # Validate curl output
+                        if [ -z "$curl_output" ]; then
+                          echo "Error: curl returned empty JSON output"
+                          exit 1
+                        fi
+
+                        # Validate JSON
+                        if ! echo "$curl_output" | jq -e . > /dev/null 2>&1; then
+                          echo "Error: Invalid JSON response from curl. API response was: $curl_output"
+                          exit 1
+                        fi
+
+                        # Check for API error code
+                        if echo "$curl_output" | jq -e 'has("code")' > /dev/null 2>&1; then
+                          curl_code=$(echo "$curl_output" | jq -r '.code')
+                          echo "The 'code' field exists. Its value is: $curl_code"
+                          if [[ -n "$curl_code" ]] && [[ "$curl_code" -lt 200 || "$curl_code" -ge 300 ]]; then
+                            curl_message=$(echo "$curl_output" | jq -r '.message')
+                            echo "Error: HTTP $curl_code: $curl_message. API response was: $curl_output"
+                            exit 1
+                          fi
+                        fi
+
+                        # Extract job ID only if the 'id' field exists and no curl error code was found.
+                        if echo "$curl_output" | jq -e 'has("id")' > /dev/null 2>&1; then
+                            JOB_ID=$(echo "$curl_output" | jq -r '.id')
+                        fi
+
+                        # Validate job ID
+                        if [ -z "$JOB_ID" ]; then
+                          echo "Error: Invalid JSON response. API response was: $curl_output"
+                          exit 1
+                        fi
+
+                        echo "Job ID: $JOB_ID"
+                        export JOB_ID
+                      envVariables:
+                        HRZ_TOKEN: <+stage.spec.execution.steps.deployjob.steps.getssohrztoken.output.outputVariables.SSO_HRZ_TOKEN>
+                        MANIFEST: <+artifact.tag>
+                        ENVIRONMENT: <+infra.variables.environment>
+                        DEPLOY_STRATEGY: <+stage.spec.execution.steps.deployjob.steps.getdeploystrategy.output.outputVariables.DEPLOY_STRATEGY>
+                        SERVICE_NAME: <+service.name>
+                        JIRA_ID: <+stage.variables.jira_id>
+                      outputVariables:
+                        - name: JOB_ID
+                          type: String
+                          value: JOB_ID
+                - step:
+                    type: Run
+                    name: poll-job
+                    identifier: polljob
+                    spec:
+                      connectorRef: account.pypldockerhub
+                      image: alpine
+                      shell: Sh
+                      command: |-
+                        #!/bin/sh
+
+                        set -euo pipefail
+
+                        # Install dependencies
+                        apk add --no-cache jq curl
+
+                        # Validate input variables
+                        JOB_ID="${JOB_ID?Error: JOB_ID variable is not set.}"
+                        HRZ_TOKEN="${HRZ_TOKEN?Error: HRZ_TOKEN variable is not set.}"
+
+                        retry=true
+
+                        while [[ "$retry" == true ]]; do
+                          sleep 20
+
+                          JOB_INFO=$(curl -s "https://engineering.paypalcorp.com/genesis/api/genesis/api/v2/tenant/paypal/job/$JOB_ID?trace=true" \
+                            -H 'Accept: */*' \
+                            -H "Token: $HRZ_TOKEN" \
+                            -H 'Provider: pingid')
+
+                          # Validate curl output
+                          if [ -z "$JOB_INFO" ]; then
+                            echo "Error: curl returned empty JSON output"
+                            exit 1
+                          fi
+
+                          # Validate JSON
+                          if ! echo "$JOB_INFO" | jq -e . > /dev/null 2>&1; then
+                            echo "Error: Invalid JSON response from curl. Full response was: $JOB_INFO"
+                            exit 1
+                          fi
+
+                          # Extract STATUS
+                          STATUS=$(echo "$JOB_INFO" | jq -r '.status')
+                          if [[ "$STATUS" == "null" ]]; then
+                            echo "Error: 'status' field not found in JSON response. Response was: $JOB_INFO"
+                            exit 1
+                          fi
+
+                          # Extract REQUEST_PROGRESS
+                          REQUEST_PROGRESS=$(echo "$JOB_INFO" | jq -r '.requestProgress | last.msg')
+                          if [[ "$REQUEST_PROGRESS" == "null" ]]; then
+                            echo "Warning: 'requestProgress' field not found in JSON response. Response was: $JOB_INFO"
+                            REQUEST_PROGRESS="" # Set to empty string for consistent handling
+                          fi
+
+                          echo "Current Status: $STATUS"
+                          if [[ -n "$REQUEST_PROGRESS" ]]; then
+                            echo "Current JOB MESSAGE: $REQUEST_PROGRESS"
+                          fi
+
+                          case "$STATUS" in
+                            "JOB_STATUS_SUCCESS")
+                              retry=false
+                              ;;
+                            "JOB_STATUS_CANCEL_ROLLBACK_SUCCESS")
+                              retry=false
+                              echo "Job Cancelled"
+                              ;;
+                            "JOB_STATUS_ROLLBACK_SUCCESS")
+                              retry=false
+                              echo "Job Rolledback"
+                              ;;
+                            "JOB_STATUS_USER_CANCELED")
+                              retry=false
+                              echo "Job Cancelled By User"
+                              ;;
+                            "JOB_STATUS_FAILED")
+                              retry=false
+                              echo "Job Failed"
+                              ;;
+                          esac
+                        done
+                      envVariables:
+                        JOB_ID: <+stage.spec.execution.steps.deployjob.steps.schedulejob.output.outputVariables.JOB_ID>
+                        HRZ_TOKEN: <+stage.spec.execution.steps.deployjob.steps.getssohrztoken.output.outputVariables.SSO_HRZ_TOKEN>
+                      outputVariables:
+                        - name: STATUS
+                          type: String
+                          value: STATUS
+              stepGroupInfra:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.toolsprimaryk8s
+                  namespace: prod
+                  harnessImageConnectorRef: account.pypldockerhub
+        rollbackSteps:
+          - stepGroup:
+              name: rollback-deploy
+              identifier: rollbackdeploy
+              steps:
+                - step:
+                    type: Run
+                    name: rollback-deploy
+                    identifier: rollbackdeploy
+                    spec:
+                      connectorRef: account.pypldockerhub
+                      image: alpine
+                      shell: Sh
+                      command: |-
+                        #!/bin/sh
+
+                        set -euo pipefail
+
+                        # Install dependencies
+                        apk add --no-cache jq curl
+
+                        # Validate input variables
+                        JOB_ID="${JOB_ID?Error: JOB_ID variable is not set.}"
+                        HRZ_TOKEN="${HRZ_TOKEN?Error: HRZ_TOKEN variable is not set.}"
+
+                        curl_output=$(curl -s "https://engineering.paypalcorp.com/genesis/api/genesis/api/v2/tenant/paypal/job/$JOB_ID/cancel" \
+                          -H "Token: $HRZ_TOKEN" \
+                          -H 'Provider: pingid' \
+                          --data-raw 'null')
+
+                        # Validate curl output
+                        if [ -z "$curl_output" ]; then
+                          echo "Error: curl returned empty JSON output"
+                          exit 1
+                        fi
+
+                        # Validate JSON
+                        if ! echo "$curl_output" | jq -e . > /dev/null 2>&1; then
+                          echo "Error: Invalid JSON response from curl. API response was: $curl_output"
+                          exit 1
+                        fi
+
+                        # Check for API error code
+                        if echo "$curl_output" | jq -e 'has("code")' > /dev/null 2>&1; then
+                          curl_code=$(echo "$curl_output" | jq -r '.code')
+                          echo "The 'code' field exists. Its value is: $curl_code"
+                          if [[ -n "$curl_code" ]] && [[ "$curl_code" -lt 200 || "$curl_code" -ge 300 ]]; then
+                            curl_message=$(echo "$curl_output" | jq -r '.message')
+                            echo "Error: HTTP $curl_code: $curl_message. Full response was: $curl_output"
+                            exit 1
+                          fi
+                        fi
+
+                        # Extract job ID only if the 'id' field exists and no curl error code was found.
+                        if echo "$curl_output" | jq -e 'has("id")' > /dev/null 2>&1; then
+                            CANCEL_JOB_ID=$(echo "$curl_output" | jq -r '.id')
+                        fi
+
+                        # Validate job ID
+                        if [ -z "$CANCEL_JOB_ID" ]; then
+                          echo "Error: Invalid JSON response. API response was: $curl_output"
+                          exit 1
+                        fi
+
+                        echo "Job ID: $CANCEL_JOB_ID"
+                        export CANCEL_JOB_ID
+                      envVariables:
+                        HRZ_TOKEN: <+stage.spec.execution.steps.deployjob.steps.getssohrztoken.output.outputVariables.SSO_HRZ_TOKEN>
+                        JOB_ID: <+execution.steps.deployjob.steps.polljob.spec.envVariables.JOB_ID>
+                      outputVariables:
+                        - name: CANCEL_JOB_ID
+                          type: String
+                          value: CANCEL_JOB_ID
+                - step:
+                    type: Run
+                    name: poll-rollback-job
+                    identifier: pollrollbackjob
+                    spec:
+                      connectorRef: account.pypldockerhub
+                      image: alpine
+                      shell: Sh
+                      command: |-
+                        #!/bin/sh
+
+                        set -euo pipefail
+
+                        # Install dependencies
+                        apk add --no-cache jq curl
+
+                        # Validate input variables
+                        JOB_ID="${JOB_ID?Error: JOB_ID variable is not set.}"
+                        HRZ_TOKEN="${HRZ_TOKEN?Error: HRZ_TOKEN variable is not set.}"
+
+                        retry=true
+
+                        while [[ "$retry" == true ]]; do
+                          sleep 20
+
+                          JOB_INFO=$(curl -s "https://engineering.paypalcorp.com/genesis/api/genesis/api/v2/tenant/paypal/job/$JOB_ID?trace=true" \
+                            -H 'Accept: */*' \
+                            -H "Token: $HRZ_TOKEN" \
+                            -H 'Provider: pingid')
+
+                          # Validate curl output
+                          if [ -z "$JOB_INFO" ]; then
+                            echo "Error: curl returned empty JSON output"
+                            exit 1
+                          fi
+
+                          # Validate JSON
+                          if ! echo "$JOB_INFO" | jq -e . > /dev/null 2>&1; then
+                            echo "Error: Invalid JSON response from curl. Full response was: $JOB_INFO"
+                            exit 1
+                          fi
+
+                          # Extract STATUS
+                          STATUS=$(echo "$JOB_INFO" | jq -r '.status')
+                          if [[ "$STATUS" == "null" ]]; then
+                            echo "Error: 'status' field not found in JSON response. Response was: $JOB_INFO"
+                            exit 1
+                          fi
+
+                          # Extract REQUEST_PROGRESS
+                          REQUEST_PROGRESS=$(echo "$JOB_INFO" | jq -r '.requestProgress | last.msg')
+                          if [[ "$REQUEST_PROGRESS" == "null" ]]; then
+                            echo "Warning: 'requestProgress' field not found in JSON response. Response was: $JOB_INFO"
+                            REQUEST_PROGRESS="" # Set to empty string for consistent handling
+                          fi
+
+                          echo "Current Status: $STATUS"
+                          if [[ -n "$REQUEST_PROGRESS" ]]; then
+                            echo "Current JOB MESSAGE: $REQUEST_PROGRESS"
+                          fi
+
+                          case "$STATUS" in
+                            "JOB_STATUS_SUCCESS")
+                              retry=false
+                              ;;
+                            "JOB_STATUS_CANCEL_ROLLBACK_SUCCESS")
+                              retry=false
+                              echo "Job Cancelled"
+                              ;;
+                            "JOB_STATUS_USER_CANCELED")
+                              retry=false
+                              echo "Job Cancelled By User"
+                              ;;
+                            "JOB_STATUS_FAILED")
+                              retry=false
+                              echo "Job Failed"
+                              ;;
+                          esac
+                        done
+                      envVariables:
+                        JOB_ID: <+stage.spec.execution.steps.deployjob.steps.schedulejob.output.outputVariables.JOB_ID>
+                        HRZ_TOKEN: <+stage.spec.execution.steps.deployjob.steps.getssohrztoken.output.outputVariables.SSO_HRZ_TOKEN>
+              stepGroupInfra:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.toolsprimaryk8s
+                  namespace: prod
+                  harnessImageConnectorRef: account.pypldockerhub
       environment:
         environmentRef: <+input>
         deployToAll: false
         environmentInputs: <+input>
         serviceOverrideInputs: <+input>
         infrastructureDefinitions: <+input>
-      service:
-        serviceRef: <+input>
-        serviceInputs: <+input>
     failureStrategies:
       - onFailure:
           errors:
             - AllErrors
           action:
             type: StageRollback
+    variables:
+      - name: version_fallback
+        type: String
+        description: ""
+        required: false
+        value: <+input>
+      - name: jira_id
+        type: String
+        description: ""
+        required: false
+        value: <+input>
+    when:
+      pipelineStatus: Success
+      condition: <+input>
