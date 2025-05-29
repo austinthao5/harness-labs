@@ -15,7 +15,6 @@ template:
         versionLabel: v1
       service:
         serviceRef: <+input>
-        serviceInputs: <+input>
       execution:
         steps:
           - step:
@@ -586,8 +585,6 @@ template:
       environment:
         environmentRef: <+input>
         deployToAll: false
-        environmentInputs: <+input>
-        serviceOverrideInputs: <+input>
         infrastructureDefinitions: <+input>
     failureStrategies:
       - onFailure:
