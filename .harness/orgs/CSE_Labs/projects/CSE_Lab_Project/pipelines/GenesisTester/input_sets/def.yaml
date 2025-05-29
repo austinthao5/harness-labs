@@ -1,5 +1,6 @@
 inputSet:
   name: def
+  tags: {}
   identifier: def
   orgIdentifier: CSE_Labs
   projectIdentifier: CSE_Lab_Project
