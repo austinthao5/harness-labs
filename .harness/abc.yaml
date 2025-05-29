@@ -1,0 +1,20 @@
+inputSet:
+  name: abc
+  tags: {}
+  identifier: abc
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  pipeline:
+    identifier: GenesisTester
+    stages:
+      - stage:
+          identifier: test
+          template:
+            templateInputs:
+              type: Deployment
+              spec:
+                environment:
+                  environmentRef: DeluxeCorpMulesoftDemoEnv
+                service:
+                  serviceRef: ""
+                  serviceInputs: <+input>
