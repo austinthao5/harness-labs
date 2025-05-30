@@ -1,0 +1,18 @@
+template:
+  name: pipelineTemplate
+  identifier: pipelineTemplate
+  versionLabel: "1"
+  type: Pipeline
+  projectIdentifier: austintesting
+  orgIdentifier: default
+  tags: {}
+  spec:
+    stages:
+      - stage:
+          name: a
+          identifier: a
+          tags: {}
+          template:
+            templateRef: stageTemplate
+            versionLabel: "1"
+            gitBranch: master-copy-patch
