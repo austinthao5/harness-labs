@@ -1,0 +1,6 @@
+environment:
+  name: ProdTest
+  identifier: ProdTest
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  type: Production
