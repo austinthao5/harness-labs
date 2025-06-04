@@ -19,9 +19,9 @@ pipeline:
                 serviceRef: <+input>
                 serviceInputs: <+input>
               environment:
-                environmentRef: <+input>
-                infrastructureDefinitions: <+input>
-                environmentInputs: <+input>
+                environmentRef: DeluxeCorpMulesoftDemoEnv
+                infrastructureDefinitions:
+                  - identifier: MulesoftDev
             variables:
               - name: version_fallback
                 type: String
