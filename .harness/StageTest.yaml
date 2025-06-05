@@ -1,0 +1,6 @@
+environment:
+  name: StageTest
+  identifier: StageTest
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  type: PreProduction
