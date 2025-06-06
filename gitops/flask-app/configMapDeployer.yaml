@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dynamic-configmap-app
+  namespace: austin-prod1-agent
+  labels:
+    app: dynamic-configmap-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dynamic-configmap-app
+  template:
+    metadata:
+      labels:
+        app: dynamic-configmap-app
+    spec:
+      containers:
+        - name: app
+          image: bitnami/kubectl:latest
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              echo "Creating ConfigMap..."
+              kubectl create configmap generated-at-runtime --from-literal=key=value -n austin-prod1-agent
+              sleep 3600
