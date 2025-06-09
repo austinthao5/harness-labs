@@ -28,6 +28,6 @@ pipeline:
                 value: <+input>
               - name: jira_id
                 type: String
-                value: <+input>
+                value: abc
             when:
               condition: <+input>
