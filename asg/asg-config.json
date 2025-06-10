@@ -1,0 +1,23 @@
+{
+  "AutoScalingGroupName": "my-asg-basic",
+  "MinSize": 1,
+  "MaxSize": 2,
+  "DesiredCapacity": 1,
+  "VPCZoneIdentifier": "subnet-0c77a4b682a51eaa0,subnet-0bc774d4d43c71d26",
+  "LaunchTemplate": {
+    "LaunchTemplateName": "my-custom-launch-template",
+    "Version": "$Latest"
+  },
+  "HealthCheckType": "EC2",
+  "HealthCheckGracePeriod": 300,
+  "Tags": [
+    {
+      "Key": "Name",
+      "Value": "basic-asg-instance",
+      "PropagateAtLaunch": true
+    }
+  ],
+  "TerminationPolicies": [
+    "OldestInstance"
+  ]
+}
