@@ -3,7 +3,7 @@
   "LaunchTemplateData": {
     "ImageId": "ami-06573e0c8f4b07020",
     "InstanceType": "t3.medium",
-    "KeyName": "my-keypair-name",
+    "KeyName": "austin-thao-m3",
     "SecurityGroupIds": [
       "sg-02c12a52860640e2d"
     ],
