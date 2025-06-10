@@ -1,7 +1,7 @@
 {
   "LaunchTemplateName": "my-custom-ami-launch-template",
   "LaunchTemplateData": {
-    "ImageId": "ami-0703cb3be0d6d41de",
+    "ImageId": "ami-06573e0c8f4b07020",
     "InstanceType": "t3.medium",
     "KeyName": "my-keypair-name",
     "SecurityGroupIds": [
