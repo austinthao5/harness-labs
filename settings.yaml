@@ -1,5 +1,3 @@
 settings:
   secret: <+secrets.getValue("CSE_Lab_Project_TEST_ME")>
   secret2: "CSE_Lab_Project_TEST_ME"
-appProperties:
-  jdbc.frame.serverName: <+secrets.getValue("CSE_Lab_Project_TEST_ME")>
