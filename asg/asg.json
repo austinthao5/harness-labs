@@ -1,0 +1,33 @@
+{
+  "LaunchTemplateName": "my-custom-ami-launch-template",
+  "LaunchTemplateData": {
+    "ImageId": "ami-0418306302097dbff",   // <-- Replace with your AMI ID
+    "InstanceType": "t3.medium",
+    "KeyName": "my-keypair-name",
+    "SecurityGroupIds": [
+      "sg-02c12a52860640e2d"
+    ],
+    "UserData": "IyEvYmluL2Jhc2gKZWNobyAiSGVsbG8gZnJvbSBjdXN0b20gQU1JIiA+IC9ob21lL2VjMi11c2VyL2dyZWV0aW5nLnR4dA==",
+    "BlockDeviceMappings": [
+      {
+        "DeviceName": "/dev/xvda",
+        "Ebs": {
+          "VolumeSize": 20,
+          "VolumeType": "gp3",
+          "DeleteOnTermination": true
+        }
+      }
+    ],
+    "TagSpecifications": [
+      {
+        "ResourceType": "instance",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "my-custom-launch-template-instance"
+          }
+        ]
+      }
+    ]
+  }
+}
