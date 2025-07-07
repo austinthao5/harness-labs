@@ -4,7 +4,7 @@ metadata:
   name: canary-example-service
 spec:
   selector:
-    app: canary-example
+    app: canary-example-test
   ports:
     - name: http
       protocol: TCP
