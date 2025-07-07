@@ -5,5 +5,5 @@
   "serviceTag" : "flaskapp",
   "namespace" : "austin-gitops-demo",
   "project" : "2d97e61f",
-  "harnessPR" : "PipelineExecution20"
+  "harnessPR" : "PipelineExecution21"
 }
