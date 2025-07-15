@@ -1,5 +1,5 @@
 namespace: "austin-argocd"
 project: "3164c471"
 abc: "abc"
-harnessPR: "ChageMe25"
+harnessPR: "ChageMe26"
 appName: "guestbook"
