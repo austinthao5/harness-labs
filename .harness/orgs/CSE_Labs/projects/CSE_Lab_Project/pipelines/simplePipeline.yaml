@@ -5,6 +5,5 @@ pipeline:
   template:
     templateRef: simplePipeline
     versionLabel: "1"
-    gitBranch: feature/test-variable
   projectIdentifier: CSE_Lab_Project
   orgIdentifier: CSE_Labs
