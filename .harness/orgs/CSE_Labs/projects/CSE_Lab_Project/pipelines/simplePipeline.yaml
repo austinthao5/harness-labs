@@ -5,5 +5,17 @@ pipeline:
   template:
     templateRef: simplePipeline
     versionLabel: "1"
+    templateInputs:
+      stages:
+        - stage:
+            identifier: simpleBuild
+            template:
+              templateInputs:
+                type: CI
+                spec:
+                  infrastructure:
+                    type: KubernetesDirect
+                    spec:
+                      harnessImageConnectorRef: <+input>
   projectIdentifier: CSE_Lab_Project
   orgIdentifier: CSE_Labs
