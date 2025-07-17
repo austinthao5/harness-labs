@@ -5,7 +5,7 @@ metadata:
   labels:
     app: nginx
 spec:
-  replicas: <+stage.variables.replicas>
+  replicas: {{.Values.replicas}}
   selector:
     matchLabels:
       app: nginx
