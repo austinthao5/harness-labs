@@ -1,5 +1,5 @@
 name: harness-example
-replicas: 2
+replicas: <+stage.variables.replicas>
 testVar: 1
 image: ${artifact.metadata.image}
 dockercfg: ${artifact.source.dockerconfig}
