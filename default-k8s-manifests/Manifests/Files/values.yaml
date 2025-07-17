@@ -1,2 +1,2 @@
 name: harness-example
-replicas: <+stage.variables.replicas>
+replicas: "<+stage.variables.replicas>"
