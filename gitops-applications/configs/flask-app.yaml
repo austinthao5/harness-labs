@@ -2,7 +2,7 @@ common:
   envTag: "gitopsdemo"
   namespace: "austin-gitops-demo"
   project: "2d97e61f"
-harnessPR: "PipelineExecution37"
+harnessPR: "PipelineExecution38"
 deployment:
   <<: "common_values"
   abc: "456"
