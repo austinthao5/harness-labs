@@ -1,4 +1,4 @@
 settings:
   secret: <+secrets.getValue("CSE_Lab_Project_TEST_ME")>
   secret2: "CSE_Lab_Project_TEST_ME"
-  secret3: "<+stage.variables.testStageVar>
+  secret3: "<+stage.variables.testStageVar>"
