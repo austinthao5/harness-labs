@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dynamic-configmap-app
-  namespace: austin-prod1-agent
+  namespace: smp4
   labels:
     app: dynamic-configmap-app
 spec:
