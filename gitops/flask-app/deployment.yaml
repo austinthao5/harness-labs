@@ -5,7 +5,7 @@ metadata:
   labels:
     app: simple-flask
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: simple-flask
@@ -17,5 +17,17 @@ spec:
       containers:
         - name: flask-container
           image: austinthao/flask-app:v1
+          readinessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - |
+                # Wait 15 seconds before reporting ready
+                if [ $(($(date +%s) - $(cat /tmp/start_time))) -gt 15 ]; then
+                  exit 0
+                else
+                  exit 1
+                fi
           ports:
             - containerPort: 80
