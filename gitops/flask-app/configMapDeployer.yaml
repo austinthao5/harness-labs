@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dynamic-configmap-app
-  namespace: smp4
   labels:
     app: dynamic-configmap-app
 spec:
