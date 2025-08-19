@@ -21,7 +21,7 @@ spec:
             httpGet:
               path: /
               port: 80
-            initialDelaySeconds: 15   # Wait 15 seconds before starting to probe
+            initialDelaySeconds: 20   # Wait 15 seconds before starting to probe
             periodSeconds: 2          # Check every 2 seconds after that
             timeoutSeconds: 1         # Timeout for each probe
             failureThreshold: 3       # Mark pod not ready after 3 consecutive failures
