@@ -1,0 +1,11 @@
+common:
+  envTag: "gitopsdemo"
+  namespace: "austin-gitops-demo"
+  project: "2d97e61f"
+harnessPR: "PipelineExecution38"
+deployment:
+  <<: "common_values"
+  abc: "456"
+  appName: "flask-app"
+  serviceTag: "flaskapp"
+  harnessPR: "PipelineExecution35"
