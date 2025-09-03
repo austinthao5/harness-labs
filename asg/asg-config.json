@@ -8,7 +8,8 @@
     "LaunchTemplateName": "my-custom-launch-template",
     "Version": "$Latest"
   },
-  "HealthCheckType": "EC2",
+  "HealthCheckType": "ELB",
+  "TargetGroupARNs": ["fake-arn-here"]
   "HealthCheckGracePeriod": 300,
   "Tags": [
     {
