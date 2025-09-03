@@ -1,8 +1,8 @@
 {
   "AutoScalingGroupName": "my-asg-basic",
-  "MinSize": 1,
-  "MaxSize": 2,
-  "DesiredCapacity": 1,
+  "MinSize": 3,
+  "MaxSize": 3,
+  "DesiredCapacity": 3,
   "VPCZoneIdentifier": "subnet-0c77a4b682a51eaa0,subnet-0bc774d4d43c71d26",
   "LaunchTemplate": {
     "LaunchTemplateName": "my-custom-launch-template",
