@@ -9,7 +9,7 @@
     "Version": "$Latest"
   },
   "HealthCheckType": "ELB",
-  "TargetGroupARNs": ["fake-arn-here"]
+  "TargetGroupARNs": ["fake-arn-here"],
   "HealthCheckGracePeriod": 300,
   "Tags": [
     {
