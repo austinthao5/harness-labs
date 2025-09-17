@@ -10,7 +10,7 @@ variable "versioning_enabled" {
 }
 
 variable "tags" {
-  description = "A map of tags to assign to the bucket"
+  description = "A map of tags to assign to the bucket test"
   type        = map(string)
   default     = {}
 }
