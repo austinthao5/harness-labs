@@ -1,6 +1,7 @@
 environment:
   name: StageTest
   identifier: StageTest
+  tags: {}
+  type: PreProduction
   orgIdentifier: CSE_Labs
   projectIdentifier: CSE_Lab_Project
-  type: Production
