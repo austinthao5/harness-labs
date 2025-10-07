@@ -1,0 +1,8 @@
+environment:
+  name: testGitEnv
+  identifier: testGitEnv
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  type: PreProduction
+  description: ""
+  tags: {}
