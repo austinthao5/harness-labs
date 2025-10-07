@@ -1,0 +1,13 @@
+infrastructureDefinition:
+  name: k8s_ext_01_data_a1g_k8s
+  identifier: k8s_ext_01_data_a1g_k8s
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  environmentRef: oat_data_ext_41
+  deploymentType: Kubernetes
+  type: KubernetesDirect
+  spec:
+    connectorRef: account.testeksconnector
+    namespace: austin-test-ns
+    releaseName: release-<+INFRA_KEY_SHORT_ID>
+  allowSimultaneousDeployments: false
