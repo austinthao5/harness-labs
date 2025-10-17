@@ -2,25 +2,25 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 6.0" # Adjust based on your Terraform version
+      version = "~> 6.0"
     }
   }
 }
 
 provider "google" {
-  project = var.project_id
-  region  = var.region
+  project = "my-static-project-id"
+  region  = "us-central1"
 }
 
-resource "google_storage_bucket" "bucket" {
-  name          = var.bucket_name
-  location      = var.location
-  storage_class = var.storage_class
+resource "google_storage_bucket" "demo_bucket" {
+  name          = "my-static-demo-bucket-1234"
+  location      = "US"
+  storage_class = "STANDARD"
 
   uniform_bucket_level_access = true
 
   versioning {
-    enabled = var.versioning
+    enabled = true
   }
 
   lifecycle_rule {
@@ -31,8 +31,13 @@ resource "google_storage_bucket" "bucket" {
       age = 365
     }
   }
+
+  labels = {
+    environment = "dev"
+    owner       = "terragrunt-example"
+  }
 }
 
 output "bucket_name" {
-  value = google_storage_bucket.bucket.name
+  value = google_storage_bucket.demo_bucket.name
 }
