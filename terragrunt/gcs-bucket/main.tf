@@ -9,7 +9,7 @@ backend "gcs": {}
 }
 
 provider "google" {
-  project = "my-static-project-id"
+  project = "kubernetes-austin"
   region  = "us-central1"
 }
 
