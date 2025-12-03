@@ -1,4 +1,4 @@
-name: harness-quickstart-<+INFRA_KEY_SHORT_ID>
+name: harness-quickstart-<+pipeline.stages.abc.spec.infrastructure.output.releaseName>
 replicas: 1
 
 image: "<+artifact.image>"
