@@ -1,4 +1,4 @@
-name: harness-quickstart-<+pipeline.stages.abc.spec.infrastructure.output.releaseName>
+name: harness-quickstart-<+pipeline.stages.Deploy_to_Dev.spec.infrastructure.output.releaseName>
 replicas: 1
 
 image: "<+artifact.image>"
