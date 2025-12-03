@@ -1,4 +1,4 @@
-name: harness-quickstart
+name: harness-quickstart-<+INFRA_KEY_SHORT_ID>
 replicas: 1
 
 image: "<+artifact.image>"
