@@ -1,4 +1,4 @@
-service: <+service.name>
+service: hello
 frameworkVersion: '2 || 3'
 
 provider:
