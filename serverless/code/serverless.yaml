@@ -5,7 +5,7 @@ provider:
   name: aws
   runtime: nodejs22.x
 functions:
-  hello:
+  fh-cds-test-hello:
     handler: handler.hello
     events:
       - httpApi:
