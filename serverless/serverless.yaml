@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Basic Serverless Lambda Example
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: my-basic-lambda
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      CodeUri: ./src
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        ApiGet:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: GET
