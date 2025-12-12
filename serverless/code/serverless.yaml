@@ -1,4 +1,4 @@
-service: hello
+service: fh-cds-test-hello
 frameworkVersion: '2 || 3'
 
 provider:
