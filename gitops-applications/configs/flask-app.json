@@ -3,7 +3,7 @@
   "envTag" : "gitopsdemo",
   "appName" : "flask-app",
   "serviceTag" : "flaskapp",
-  "namespace" : "austin-prod1-agent",
-  "project" : "2d97e61f",
+  "namespace" : "gitops-agent",
+  "project" : "eks-app-project",
   "harnessPR" : "PipelineExecution35"
 }
