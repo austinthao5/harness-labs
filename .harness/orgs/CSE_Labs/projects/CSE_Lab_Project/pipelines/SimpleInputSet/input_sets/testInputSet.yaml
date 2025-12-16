@@ -1,0 +1,14 @@
+inputSet:
+  name: testInputSet
+  identifier: testInputSet
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  pipeline:
+    identifier: SimpleInputSet
+    variables:
+      - name: testvar
+        type: String
+        value: abc
+      - name: testVar2
+        type: String
+        value: ""
