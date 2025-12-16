@@ -1,0 +1,33 @@
+pipeline:
+  name: SimpleInputSet
+  identifier: SimpleInputSet
+  projectIdentifier: CSE_Lab_Project
+  orgIdentifier: CSE_Labs
+  tags: {}
+  stages:
+    - stage:
+        name: test
+        identifier: test
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Wait
+                  name: Wait_1
+                  identifier: Wait_1
+                  spec:
+                    duration: 10s
+        tags: {}
+  variables:
+    - name: testvar
+      type: String
+      description: ""
+      required: false
+      value: <+input>
+    - name: testVar2
+      type: String
+      description: ""
+      required: false
+      value: <+input>
