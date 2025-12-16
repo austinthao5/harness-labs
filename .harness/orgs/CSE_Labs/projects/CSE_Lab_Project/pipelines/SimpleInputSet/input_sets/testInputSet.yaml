@@ -12,4 +12,5 @@ inputSet:
         value: abc
       - name: testVar2
         type: String
-        value: <+input>
+        value: ""
+  isInlineHCEntity: false
