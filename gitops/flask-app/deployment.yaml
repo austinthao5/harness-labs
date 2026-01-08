@@ -15,15 +15,25 @@ spec:
       labels:
         app: simple-flask
       annotations:
-        # Enable automatic OneAgent injection
         oneagent.dynatrace.com/injected: "true"
     spec:
       containers:
         - name: flask-container
-          image: austinthao/flask-app:v2  # updated Dockerfile image
+          image: austinthao/flask-app:v1
           ports:
             - containerPort: 80
+          env:
+            # Enables Python instrumentation for Dynatrace OneAgent
+            - name: ONEAGENT_ENABLE_PYTHON
+              value: "true"
+            # Optional: specify a service name for Dynatrace
+            - name: DT_SERVICE
+              value: "simple-flask"
           readinessProbe:
             httpGet:
               path: /
               port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          # Use Gunicorn for better production behavior
+          command: ["gunicorn", "-b", "0.0.0.0:80", "app:app"]
