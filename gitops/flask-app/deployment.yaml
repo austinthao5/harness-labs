@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: flask-container
-          image: austinthao/flask-app:v1
+          image: austinthao/flask-app:v2
           ports:
             - containerPort: 80
           env:
