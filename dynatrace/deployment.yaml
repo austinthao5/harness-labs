@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dynatrace-demo
+  labels:
+    app: dynatrace-demo
+  namespace: harness-cv-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dynatrace-demo
+  template:
+    metadata:
+      labels:
+        app: dynatrace-demo
+      annotations:
+        dynatrace.com/inject: "true"
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dynatrace-demo
+  namespace: harness-cv-demo
+spec:
+  type: ClusterIP
+  selector:
+    app: dynatrace-demo
+  ports:
+    - port: 80
+      targetPort: 80
