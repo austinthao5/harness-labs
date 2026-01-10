@@ -16,6 +16,7 @@ spec:
         app: dynatrace-demo
       annotations:
         dynatrace.com/inject: "true"
+        redeployCount: "{{ .Values.redployCount }}"   # <-- change this to trigger redeploy
     spec:
       containers:
         - name: nginx
