@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: splunk-demo
+      annotations:
+        redeployCount: "{{ .Values.redployCount }}"
     spec:
       containers:
         - name: flask-container
