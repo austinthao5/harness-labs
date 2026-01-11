@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: splunk-demo
+  labels:
+    app: splunk-demo
+  namespace: harness-cv-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: splunk-demo
+  template:
+    metadata:
+      labels:
+        app: splunk-demo
+      annotations:
+        dynatrace.com/inject: "true"
+        redeployCount: "{{ .Values.redployCount }}"   # <-- change this to trigger redeploy
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: splunk-demo
+  namespace: harness-cv-demo
+spec:
+  type: ClusterIP
+  selector:
+    app: splunk-demo
+  ports:
+    - port: 80
+      targetPort: 80
