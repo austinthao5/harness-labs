@@ -14,13 +14,14 @@ spec:
     metadata:
       labels:
         app: splunk-demo
-      annotations:
-        dynatrace.com/inject: "true"
-        redeployCount: "{{ .Values.redployCount }}"   # <-- change this to trigger redeploy
     spec:
       containers:
-        - name: nginx
-          image: nginx:1.25
+        - name: flask-container
+          image: austinthao/flask-app:v1
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
           ports:
             - containerPort: 80
 ---
@@ -30,9 +31,14 @@ metadata:
   name: splunk-demo
   namespace: splunk-demo
 spec:
-  type: ClusterIP
   selector:
     app: splunk-demo
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+
   ports:
     - port: 80
       targetPort: 80
