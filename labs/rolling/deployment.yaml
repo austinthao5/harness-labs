@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rolling-example
+  labels:
+    app: rolling-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rolling-example
+  template:
+    metadata:
+      labels:
+        app: rolling-example
+    spec:
+      containers:
+        - name: rolling-example
+          image: hashicorp/http-echo
+          args:
+            - "-text=Rolling Deploy"
+          ports:
+            - containerPort: 5678
