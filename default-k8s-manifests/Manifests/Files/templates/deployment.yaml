@@ -47,11 +47,11 @@ spec:
     spec:
       {{- if .Values.dockercfg}}
       imagePullSecrets:
-      - name: {{.Values.name}}-dockercfg FAILME
+      - name: {{.Values.name}}-dockercfg
       {{- end}}
       containers:
       - name: {{.Values.name}}
-        image: {{.Values.image}}
+        image: {{.Values.image}} FAILME
         {{- if or .Values.env.config .Values.env.secrets}}
         envFrom:
         {{- if .Values.env.config}}
