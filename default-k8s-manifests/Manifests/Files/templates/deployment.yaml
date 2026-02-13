@@ -50,7 +50,7 @@ spec:
       - name: {{.Values.name}}-dockercfg
       {{- end}}
       containers:
-      - name: {{.Values.name}}
+      - name: {{.Values.name}} FAILME
         image: {{.Values.image}}
         {{- if or .Values.env.config .Values.env.secrets}}
         envFrom:
