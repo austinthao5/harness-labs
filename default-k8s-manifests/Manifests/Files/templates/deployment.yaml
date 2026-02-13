@@ -31,7 +31,7 @@ type: kubernetes.io/dockercfg
 ---
 {{- end}}
 
-apiVersion: apps/v1
+apiVersion: apps/v1-notARealAPI
 kind: Deployment
 metadata:
   name: {{.Values.name}}-deployment
