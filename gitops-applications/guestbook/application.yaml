@@ -3,6 +3,21 @@ kind: ApplicationSet
 metadata:
   name: guestbook-appset
 spec:
+  strategy:
+    type: RollingSync
+    rollingSync:
+      steps:
+        - matchExpressions:
+            - key: envLabel
+              operator: In
+              values:
+                - env-dev
+        - matchExpressions:
+            - key: envLabel
+              operator: In
+              values:
+                - env-prod
+          maxUpdate: 10%
   generators:
     - git:
         repoURL: https://github.com/austinthao5/harness-labs.git
