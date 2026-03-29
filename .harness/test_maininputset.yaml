@@ -1,0 +1,14 @@
+inputSet:
+  name: test_main-inputset
+  identifier: test_maininputset
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
+  pipeline:
+    identifier: testpushpipeline
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
