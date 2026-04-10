@@ -1,4 +1,4 @@
-namespace: "gitops-agent"
+namespace: "austin-gitops-ns"
 project: "eks-app-project"
 abc: "abc"
 harnessPR: "ChageMe27"
