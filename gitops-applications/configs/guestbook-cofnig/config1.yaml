@@ -1,1 +1,5 @@
-test
+namespace: "gitops-agent"
+project: "eks-app-project"
+abc: "abc"
+harnessPR: "ChageMe27"
+appName: "guestbook"
