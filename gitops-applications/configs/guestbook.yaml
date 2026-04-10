@@ -1,5 +1,5 @@
-namespace: "austin-gitops-ns"
-project: "eks-app-project"
-abc: "abc"
-harnessPR: "ChageMe27"
-appName: "guestbook"
+namespace: austin-gitops-ns
+project: eks-app-project
+abc: abc
+harnessPR: ChageMeLOhCwedhSJ65j_NVDSk2vQ
+appName: guestbook
