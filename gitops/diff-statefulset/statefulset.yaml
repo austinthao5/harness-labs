@@ -29,5 +29,5 @@ spec:
         resources:
           requests:
             storage: 2Gi
-        storageClassName: oci-bv
+        storageClassName: standard
         volumeMode: Filesystem
