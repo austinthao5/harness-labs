@@ -1,0 +1,5 @@
+namespace: "austin-gitops-ns"
+project: "austin-test-project"
+abc: "abc"
+harnessPR: "ChageMenwxWz5PKQUajSHYXSqRm-Q"
+appName: "diff-statefulset"
