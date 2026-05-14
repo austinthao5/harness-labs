@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: diff-statefulset-appset
+spec:
+  strategy:
+    type: RollingSync
+    rollingSync:
+      steps:
+        - matchExpressions:
+            - key: envLabel
+              operator: In
+              values:
+                - env-dev
+        - matchExpressions:
+            - key: envLabel
+              operator: In
+              values:
+                - env-prod
+          maxUpdate: 10%
+  generators:
+    - git:
+        repoURL: https://github.com/austinthao5/harness-labs.git
+        revision: HEAD
+        files:
+        - path: "gitops-applications/configs/diff-statefulset.yaml"
+  template:
+    metadata:
+      name: '{{appName}}'
+    spec:
+      project: '{{project}}'
+      source:
+        repoURL: https://github.com/austinthao5/harness-labs.git
+        path: gitops/diff-statefulset
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
