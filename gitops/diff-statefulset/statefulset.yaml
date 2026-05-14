@@ -18,11 +18,16 @@ spec:
       - name: nginx
         image: nginx:1.27
   volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 1Gi
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+        storageClassName: oci-bv
+        volumeMode: Filesystem
