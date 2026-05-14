@@ -1,24 +1,25 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: demo-db
+  name: nginx-demo
+  namespace: austin-gitops-ns
 spec:
-  serviceName: demo-db
+  serviceName: nginx-demo
   replicas: 1
   selector:
     matchLabels:
-      app: demo-db
+      app: nginx-demo
   template:
     metadata:
       labels:
-        app: demo-db
+        app: nginx-demo
     spec:
       containers:
-      - name: postgres
-        image: postgres:16
+      - name: nginx
+        image: nginx:1.27
         volumeMounts:
         - name: data
-          mountPath: /var/lib/postgresql/data
+          mountPath: /usr/share/nginx/html
 
   volumeClaimTemplates:
   - metadata:
