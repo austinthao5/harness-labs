@@ -1,0 +1,239 @@
+template:
+  name: deploy_service
+  type: Stage
+  orgIdentifier: default
+  spec:
+    type: Deployment
+    spec:
+      deploymentType: NativeHelm
+      environment:
+        environmentRef: <+input>
+        deployToAll: false
+        environmentInputs: <+input>
+        serviceOverrideInputs: <+input>
+        infrastructureDefinitions: <+input>
+      execution:
+        steps:
+          - step:
+              name: Helm Deployment
+              identifier: helmDeployment
+              type: HelmDeploy
+              timeout: 20m
+              spec:
+                skipDryRun: false
+                ignoreReleaseHistFailStatus: true
+              failureStrategies:
+                - onFailure:
+                    errors:
+                      - Timeout
+                      - Connectivity
+                    action:
+                      type: Retry
+                      spec:
+                        retryCount: 2
+                        retryIntervals:
+                          - 1m
+                        onRetryFailure:
+                          action:
+                            type: MarkAsFailure
+          - step:
+              name: Checkout Service
+              identifier: Checkout_Service
+              template:
+                templateRef: org.Checkout_EKS_Service
+                versionLabel: "2"
+                templateInputs:
+                  type: ShellScript
+                  spec:
+                    environmentVariables:
+                      - name: NAMESPACE
+                        type: String
+                        value: <+stage.variables.environment_name>-<+serviceVariables.application_name>
+                      - name: ENV_NAME
+                        type: String
+                        value: <+stage.variables.environment_name>
+                      - name: OWNER
+                        type: String
+                        value: <+empty(<+pipeline.triggeredBy.email>)?<+stage.variables.channel>:<+pipeline.triggeredBy.email>>
+                      - name: CHECKOUT_DAYS
+                        type: String
+                        value: <+stage.variables.checkout_days>
+          - step:
+              type: Wait
+              name: wait to test
+              identifier: wait_to_test
+              spec:
+                duration: <+stage.variables.wait_before_test>
+          - stepGroup:
+              name: Test
+              identifier: Test
+              steps:
+                - parallel:
+                    - step:
+                        type: ShellScript
+                        name: Test
+                        identifier: Test
+                        spec:
+                          shell: Bash
+                          executionTarget: {}
+                          source:
+                            type: Inline
+                            spec:
+                              script: helm test --timeout 10m <+execution.steps.helmDeployment.helmDeployOutcome.releaseName> --namespace $NAMESPACE
+                          environmentVariables:
+                            - name: NAMESPACE
+                              type: String
+                              value: <+stage.variables.environment_name>-<+serviceVariables.application_name>
+                          outputVariables: []
+                        timeout: 10m
+                        when:
+                          stageStatus: Success
+                          condition: <+stage.variables.helm_test> == 'true'
+                    - step:
+                        type: Http
+                        name: HTTP Test
+                        identifier: HTTP_Test
+                        spec:
+                          url: <+stage.variables.test_url>
+                          method: GET
+                          headers: []
+                          inputVariables: []
+                          outputVariables: []
+                        timeout: 10s
+                        when:
+                          stageStatus: Success
+                          condition: "!empty(<+stage.variables.test_url>)"
+          - stepGroup:
+              name: success messaging
+              identifier: success_messaging
+              steps:
+                - parallel:
+                    - step:
+                        name: Channel Message
+                        identifier: Channel_Message
+                        template:
+                          templateRef: org.slack_sender_cd
+                          versionLabel: 0.0.1
+                          templateInputs:
+                            type: Container
+                            spec:
+                              envVariables:
+                                slack__token: <+stage.variables.slack__token>
+                                EMAIL: ""
+                                CHANNEL: <+stage.variables.message_channel>
+                                MESSAGE: <+"Success! "+<+service.identifier>+" environment "+<+stage.variables.environment_name>+", requested by "+<+pipeline.triggeredBy.email>+", was successfully created!"+<+service.identifier>+" URL is https://"+<+serviceVariables.service_prefix>+<+stage.variables.environment_name>+"."+<+variable.org.cluster_subdomain_ekspoc>>
+                            when:
+                              condition: "!empty(<+stage.variables.message_channel>)"
+                    - step:
+                        name: requester message
+                        identifier: requester_message
+                        template:
+                          templateRef: org.slack_sender_cd
+                          versionLabel: 0.0.1
+                          templateInputs:
+                            type: Container
+                            spec:
+                              envVariables:
+                                slack__token: <+stage.variables.slack__token>
+                                EMAIL: <+pipeline.triggeredBy.email>
+                                CHANNEL: ""
+                                MESSAGE: <+"Success! "+<+service.identifier>+" environment "+ <+stage.variables.environment_name>+", requested by "+<+pipeline.triggeredBy.email>+", is successfully created!">
+                            when:
+                              condition: <+stage.variables.message_requester> == "true"
+              when:
+                stageStatus: Success
+          - stepGroup:
+              name: failure messaging
+              identifier: failure_messaging
+              steps:
+                - parallel:
+                    - step:
+                        name: requester failure message
+                        identifier: requester_failure_message
+                        template:
+                          templateRef: org.slack_sender_cd
+                          versionLabel: 0.0.1
+                          templateInputs:
+                            type: Container
+                            spec:
+                              envVariables:
+                                slack__token: <+stage.variables.slack__token>
+                                EMAIL: <+pipeline.triggeredBy.email>
+                                CHANNEL: ""
+                                MESSAGE: <+"Failure! :blew_up_in_my_face:"+<+service.identifier>+" for environment "+<+stage.variables.environment_name>+" failed to deploy!">
+                            when:
+                              condition: <+stage.variables.message_requester> == "true"
+              when:
+                stageStatus: Failure
+        rollbackSteps:
+          - step:
+              name: Helm Rollback
+              identifier: helmRollback
+              type: HelmRollback
+              timeout: 10m
+              spec: {}
+      services:
+        values: <+input>
+        metadata:
+          parallel: false
+    failureStrategies:
+      - onFailure:
+          errors:
+            - AllErrors
+          action:
+            type: StageRollback
+    when:
+      pipelineStatus: Success
+      condition: <+input>.default(true)
+    variables:
+      - name: environment_name
+        type: String
+        description: The name of the environment you want to target
+        required: false
+        value: <+input>.default(<+pipeline.variables.environment_name>)
+      - name: slack__token
+        type: Secret
+        description: ""
+        required: false
+        value: org.slack_bot_oauth_token
+      - name: test_url
+        type: String
+        description: test against an HTTP/HTTPS URL
+        required: false
+        value: <+input>
+      - name: helm_test
+        type: String
+        description: Run `helm test` to verify deployment
+        required: false
+        value: <+input>.default(false).allowedValues(true,false)
+      - name: message_channel
+        type: String
+        description: Enables messaging to slack channel, if channel is populated.
+        required: false
+        value: <+input>
+      - name: wait_before_test
+        type: String
+        description: Time to waiting before testing the service. Harness duration string (1s, 1m, 1h)
+        required: false
+        value: <+input>.default(2m)
+      - name: message_requester
+        type: String
+        default: "false"
+        description: send slack message to pipeline executer
+        required: false
+        value: <+input>.default(false).allowedValues(true,false)
+      - name: checkout_days
+        type: String
+        default: "3"
+        description: Number of days the service will set the expiration date for the given environment.
+        required: false
+        value: <+input>.default(3).allowedValues(0,1,2,3,4,5,6,7)
+      - name: channel
+        type: String
+        description: The slack channel to use for communication
+        required: false
+        value: <+input>
+    delegateSelectors: <+input>
+  identifier: deploy_service
+  versionLabel: "3"
+
