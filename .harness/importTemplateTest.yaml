@@ -1,7 +1,6 @@
 template:
   name: deploy_service
   type: Stage
-  orgIdentifier: default
   spec:
     type: Deployment
     spec:
