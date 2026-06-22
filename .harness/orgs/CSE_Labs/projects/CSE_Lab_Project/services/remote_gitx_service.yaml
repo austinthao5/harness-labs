@@ -3,3 +3,6 @@ service:
   identifier: remote_gitx_service
   orgIdentifier: CSE_Labs
   projectIdentifier: CSE_Lab_Project
+  serviceDefinition:
+    spec: {}
+    type: Kubernetes
