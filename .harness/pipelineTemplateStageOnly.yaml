@@ -1,0 +1,15 @@
+pipeline:
+  name: pipelineTemplateStageOnly
+  identifier: pipelineTemplateStageOnly
+  projectIdentifier: CSE_Lab_Project
+  orgIdentifier: CSE_Labs
+  tags: {}
+  stages:
+    - stage:
+        name: test
+        identifier: test
+        tags: {}
+        template:
+          templateRef: dummy_stage_template
+          gitBranch: main
+          storeType: REMOTE
