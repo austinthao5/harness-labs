@@ -10,6 +10,4 @@ pipeline:
         identifier: test
         tags: {}
         template:
-          templateRef: dummy_stage_template
-          gitBranch: main
-          storeType: REMOTE
+          templateRef: account.stageTemplateFromAccount
