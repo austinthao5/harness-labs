@@ -1,0 +1,5 @@
+service:
+  name: remoteHelmServiceTest
+  identifier: remoteHelmServiceTest
+  orgIdentifier: CSE_Labs
+  projectIdentifier: CSE_Lab_Project
