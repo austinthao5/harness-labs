@@ -16,7 +16,7 @@ service:
                   connectorRef: testconnhelm
               optionalValuesYaml: false
               chartName: nginx
-              chartVersion: 25.0.13
+              chartVersion: <+input>
               subChartPath: ""
               helmVersion: V3
               skipResourceVersioning: false
