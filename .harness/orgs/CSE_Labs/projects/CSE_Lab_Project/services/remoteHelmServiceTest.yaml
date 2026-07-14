@@ -7,22 +7,19 @@ service:
     spec:
       manifests:
         - manifest:
-            identifier: helm
+            identifier: nginx
             type: HelmChart
             spec:
               store:
-                type: Github
+                type: Http
                 spec:
-                  connectorRef: account.accountharnesslabs
-                  gitFetchType: Branch
-                  folderPath: /my-nginx
-                  repoName: helm-charts
-                  branch: main
+                  connectorRef: testconnhelm
+              optionalValuesYaml: false
+              chartName: nginx
+              chartVersion: <+input>
               subChartPath: ""
-              valuesPaths:
-                - my-nginx/values.yaml
+              helmVersion: V3
               skipResourceVersioning: false
               enableDeclarativeRollback: false
-              helmVersion: V3
               fetchHelmChartMetadata: false
     type: NativeHelm
