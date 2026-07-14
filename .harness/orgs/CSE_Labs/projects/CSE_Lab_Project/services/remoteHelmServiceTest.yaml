@@ -3,3 +3,26 @@ service:
   identifier: remoteHelmServiceTest
   orgIdentifier: CSE_Labs
   projectIdentifier: CSE_Lab_Project
+  serviceDefinition:
+    spec:
+      manifests:
+        - manifest:
+            identifier: helm
+            type: HelmChart
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: account.accountharnesslabs
+                  gitFetchType: Branch
+                  folderPath: /my-nginx
+                  repoName: helm-charts
+                  branch: main
+              subChartPath: ""
+              valuesPaths:
+                - my-nginx/values.yaml
+              skipResourceVersioning: false
+              enableDeclarativeRollback: false
+              helmVersion: V3
+              fetchHelmChartMetadata: false
+    type: NativeHelm
