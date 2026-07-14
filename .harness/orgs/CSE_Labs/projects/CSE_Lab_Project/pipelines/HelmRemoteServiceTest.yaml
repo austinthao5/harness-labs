@@ -15,16 +15,6 @@ pipeline:
           service:
             serviceRef: remoteHelmServiceTest
             gitBranch: austin-test
-            serviceInputs:
-              serviceDefinition:
-                type: NativeHelm
-                spec:
-                  manifests:
-                    - manifest:
-                        identifier: nginx
-                        type: HelmChart
-                        spec:
-                          chartVersion: <+input>
           environment:
             environmentRef: csegcpclusternew
             deployToAll: false
