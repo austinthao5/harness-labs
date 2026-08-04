@@ -18,12 +18,8 @@ locals {
 }
 
 provider "helm" {
-  kubernetes = {
-    host = "https://${getenv("KUBERNETES_SERVICE_HOST")}:${getenv("KUBERNETES_SERVICE_PORT")}"
-
-    token = local.sa_token
-
-    cluster_ca_certificate = local.ca_cert
+  kubernetes {
+    in_cluster = true
   }
 }
 
