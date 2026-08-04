@@ -56,14 +56,6 @@ resource "harness_platform_gitops_agent" "gitops_agent" {
   }
 }
 
-
-
-resource "kubernetes_namespace" "this" {
-  metadata {
-    name = "austin-test-ns2"
-  }
-}
-
 resource "helm_release" "gitops_agent2" {
   name       = "argocd"
   namespace  = "austin-test-ns2"
