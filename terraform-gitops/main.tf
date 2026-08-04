@@ -18,7 +18,7 @@ locals {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     in_cluster = true
   }
 }
