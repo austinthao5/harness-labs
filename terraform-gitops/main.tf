@@ -16,14 +16,26 @@ terraform {
   }
 }
 
+locals {
+  sa_token = file("/var/run/secrets/kubernetes.io/serviceaccount/token")
+  ca_cert  = file("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
+}
 
 provider "kubernetes" {
-  config_path = var.kubeconfig
+  host = "https://${var.kubernetes_host}"
+
+  token = var.kubernetes_token
+
+  cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
 }
 
 provider "helm" {
-  kubernetes = {
-    config_path = var.kubeconfig
+  kubernetes {
+    host = "https://${var.kubernetes_host}"
+
+    token = var.kubernetes_token
+
+    cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
   }
 }
 
