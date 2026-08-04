@@ -9,11 +9,6 @@ terraform {
       version = "~> 3.0"
     }
 
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.35"
-    }
-  }
 }
 
 locals {
@@ -21,16 +16,8 @@ locals {
   ca_cert  = file("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 }
 
-provider "kubernetes" {
-  host = "https://${var.kubernetes_host}"
-
-  token = var.kubernetes_token
-
-  cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
-}
-
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host = "https://${var.kubernetes_host}"
 
     token = var.kubernetes_token
