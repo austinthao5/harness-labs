@@ -192,11 +192,11 @@ resource "helm_release" "gitops_agent2" {
         replicas:  1 
         resources:
           requests:
-            cpu: "1"
-            memory: 3Gi
+            cpu: "0.5"
+            memory: 1Gi
           limits:
-            cpu: "2"
-            memory: 3Gi
+            cpu: "1"
+            memory: 1.5Gi
         env:
           - name: HELM_PLUGINS
             value: /helm-sops-tools/helm-plugins/
