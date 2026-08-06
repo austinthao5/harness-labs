@@ -2,9 +2,6 @@ metadata:
   name: "flask-appset"
 apiVersion: "argoproj.io/v1alpha1"
 kind: "ApplicationSet"
-rollout-Canary:
-  image:
-    tag: "jE54Z7t3TgWucUw_fbqSTg"
 spec:
   template:
     metadata:
