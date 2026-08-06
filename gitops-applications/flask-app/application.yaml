@@ -8,7 +8,7 @@ spec:
         repoURL: https://github.com/austinthao5/harness-labs.git
         revision: HEAD
         files:
-        - path: "gitops-applications/configs/flask-app.json"
+        - path: "gitops-applications/configs/flask-app.yaml"
   template:
     metadata:
       name: '{{appName}}'
