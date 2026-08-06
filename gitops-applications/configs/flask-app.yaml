@@ -1,8 +1,14 @@
-rollout-CanaryWorker.image.tag: 6IZ6DArVS4O8tH1JhbM0Gg
-envTag: gitopsdemo
-appName: flask-app
-serviceTag: flaskapp
-namespace: austin-test-ns2
-project: 3164c471
-rollout-Canary.image.tag: 6IZ6DArVS4O8tH1JhbM0Gg
-version: 6IZ6DArVS4O8tH1JhbM0Gg
+rollout-CanaryWorker.image.tag: "6IZ6DArVS4O8tH1JhbM0Gg"
+envTag: "gitopsdemo"
+rollout-CanaryWorker:
+  image:
+    tag: "8rEMG2nMT-Sm5JFILVnfTQ"
+appName: "flask-app"
+serviceTag: "flaskapp"
+namespace: "austin-test-ns2"
+project: "3164c471"
+rollout-Canary.image.tag: "6IZ6DArVS4O8tH1JhbM0Gg"
+rollout-Canary:
+  image:
+    tag: "8rEMG2nMT-Sm5JFILVnfTQ"
+version: "8rEMG2nMT-Sm5JFILVnfTQ"
