@@ -1,4 +1,4 @@
-abc: "456",
+abc: "456"
 envTag: "gitopsdemo"
 appName: "flask-app"
 serviceTag: "flaskapp"
