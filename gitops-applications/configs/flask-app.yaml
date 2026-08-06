@@ -1,1 +1,13 @@
-dummy: "value"
+dummy: value
+rollout-CanaryWorker:
+  image:
+    tag: pLIZTo5IRF2jKubA81mosA
+envTag: gitopsdemo
+appName: flask-app
+serviceTag: flaskapp
+namespace: austin-test-ns2
+project: 3164c471
+rollout-Canary:
+  image:
+    tag: pLIZTo5IRF2jKubA81mosA
+version: pLIZTo5IRF2jKubA81mosA
