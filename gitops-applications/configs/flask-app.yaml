@@ -7,4 +7,4 @@ project: 3164c471
 harnessPR: PipelineExecution35
 rollout-Canary:
   image:
-    tag: 84oArrx0R3KPTpcx39pbqA
+    tag: cPXJpnG4ScufJ8FrL2S81Q
