@@ -1,10 +1,10 @@
-abc: '456'
-envTag: gitopsdemo
-appName: flask-app
-serviceTag: flaskapp
-namespace: austin-test-ns2
-project: 3164c471
-harnessPR: PipelineExecution35
+abc: "456"
+envTag: "gitopsdemo"
+appName: "flask-app"
+serviceTag: "flaskapp"
+namespace: "austin-test-ns2"
+project: "3164c471"
 rollout-Canary:
   image:
-    tag: cPXJpnG4ScufJ8FrL2S81Q
+    tag: "qnl6-gJOTauE9FIPJJ_Law"
+harnessPR: "PipelineExecution35"
