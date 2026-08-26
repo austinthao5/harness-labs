@@ -1,0 +1,10 @@
+clusters:
+  - name: "dev-cluster"
+    namespace: "dev-namespace
+    valuesFilePath: "/harness/delegate/dev-cluster"
+  - name: "dr-cluster"
+    namespace: "dr-namespace
+    valuesFilePath: "/harness/delegate/dr-cluster"
+  - name: "prod-cluster"
+    namespace: "prod-namespace
+    valuesFilePath: "/harness/delegate/prod-cluster"
