@@ -30,4 +30,5 @@ data:
   c360.case-management.config.profile-activity-max-attempts: "4"
   c360.case-management.config.sendgrid-confirmation-max-attempts: '2'
   some-key: "some-value"
+  otherValues: {{ .Values.otherValues }}
     
