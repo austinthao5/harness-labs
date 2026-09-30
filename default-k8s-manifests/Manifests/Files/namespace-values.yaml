@@ -1,1 +1,3 @@
-a
+createNamespace: true
+staticNamespace: austin-test-values-ns
+otherValue: <+pipeline.stages.<+stage.identifier>.spec.execution.steps.retrieve_aws_credentials_deploy.output.outputVariables.TF_SERVICE_RUNTIME_ROLE>
