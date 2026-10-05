@@ -23,3 +23,9 @@ template:
                 environmentVariables: []
                 outputVariables: []
               timeout: 10m
+    variables:
+      - name: testVar
+        type: String
+        description: ""
+        required: false
+        value: <+input>
