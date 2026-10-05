@@ -1,0 +1,15 @@
+template:
+  name: testReconcile
+  identifier: testReconcile
+  versionLabel: "1"
+  type: Pipeline
+  tags: {}
+  spec:
+    stages:
+      - stage:
+          name: test
+          identifier: test
+          tags: {}
+          template:
+            templateRef: account.stageTemplateFromAccount
+            versionLabel: "1"
