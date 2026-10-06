@@ -4,7 +4,7 @@ global:
   compatibility:
     openshift:
       adaptSecurityContext: auto
-  test: testingValues
+  test: testingValues2
 nameOverride: ''
 fullnameOverride: ''
 namespaceOverride: ''
