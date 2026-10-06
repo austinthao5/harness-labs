@@ -7,7 +7,7 @@ template:
   spec:
     stages:
       - stage:
-          name: test
+          name: test1
           identifier: test
           tags: {}
           template:
