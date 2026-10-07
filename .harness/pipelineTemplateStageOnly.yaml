@@ -11,3 +11,9 @@ pipeline:
         tags: {}
         template:
           templateRef: account.stageTemplateFromAccount
+          templateInputs:
+            type: Custom
+            variables:
+              - name: test
+                type: String
+                value: <+input>
