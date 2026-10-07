@@ -19,3 +19,6 @@ template:
                 - name: test
                   type: String
                   value: <+input>
+                - name: testVar2
+                  type: String
+                  value: <+input>
