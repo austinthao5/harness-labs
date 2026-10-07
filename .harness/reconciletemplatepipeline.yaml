@@ -1,0 +1,20 @@
+pipeline:
+  name: reconcile-template-pipeline
+  identifier: reconciletemplatepipeline
+  tags: {}
+  template:
+    templateRef: account.testReconcile
+    versionLabel: "1"
+    templateInputs:
+      stages:
+        - stage:
+            identifier: test
+            template:
+              templateInputs:
+                type: Custom
+                variables:
+                  - name: test
+                    type: String
+                    value: <+input>
+  projectIdentifier: CSE_Lab_Project
+  orgIdentifier: CSE_Labs
