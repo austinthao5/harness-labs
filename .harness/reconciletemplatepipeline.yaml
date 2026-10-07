@@ -5,16 +5,6 @@ pipeline:
   template:
     templateRef: account.testReconcile
     versionLabel: "1"
-    templateInputs:
-      stages:
-        - stage:
-            identifier: test
-            template:
-              templateInputs:
-                type: Custom
-                variables:
-                  - name: test
-                    type: String
-                    value: <+input>
+    gitBranch: main-reconcile
   projectIdentifier: CSE_Lab_Project
   orgIdentifier: CSE_Labs
