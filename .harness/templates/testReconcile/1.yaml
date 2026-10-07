@@ -13,3 +13,9 @@ template:
           template:
             templateRef: account.stageTemplateFromAccount
             versionLabel: "1"
+            templateInputs:
+              type: Custom
+              variables:
+                - name: test
+                  type: String
+                  value: <+input>
