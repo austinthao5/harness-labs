@@ -29,3 +29,8 @@ template:
         description: ""
         required: false
         value: <+input>
+      - name: testVar2
+        type: String
+        description: ""
+        required: false
+        value: <+input>
